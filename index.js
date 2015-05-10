@@ -105,7 +105,7 @@ MochaJUnitReporter.prototype.getXml = function(testsuites, testcases, stats){
 
     _suite.testsuite = _suite.testsuite.concat(_cases);
     _suiteAttr.failures = _cases.reduce(function(num, testcase){
-      return num + (testcase.testcase.length > 1)? 1 : 0;
+      return num + ((testcase.testcase.length > 1)? 1 : 0);
     }, 0);
     _suiteAttr.time = _cases.reduce(function(suitDuration, testcase){
       return suitDuration + testcase.testcase[0]._attr.time;
@@ -120,6 +120,7 @@ MochaJUnitReporter.prototype.getXml = function(testsuites, testcases, stats){
         name: 'Mocha Tests',
         timestamp: stats.start.toISOString().slice(0,-5),
         time: (new Date() - stats.start) / 1000,
+        tests: stats.tests,
         failures: stats.failures,
         errors: stats.failures
       }

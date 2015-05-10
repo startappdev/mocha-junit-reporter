@@ -49,7 +49,7 @@ function MochaJUnitReporter(runner, options) {
   }.bind(this));
 
   runner.on('end', function(){
-    this.writeXmlToDisk(this.getXml(testsuites, testcases, this.stats), filePath);
+    this.writeXmlToDisk(this.getXml(testsuites, testcases, runner.stats), filePath);
   }.bind(this));
 
 }
@@ -60,6 +60,7 @@ MochaJUnitReporter.prototype.getTestsuiteData = function(suite){
       {
         _attr: {
           name: suite.title,
+          timestamp: new Date().toISOString().slice(0,-5),
           tests: suite.tests.length
         }
       }
@@ -98,17 +99,32 @@ MochaJUnitReporter.prototype.getTestcaseData = function(test, err){
  */
 MochaJUnitReporter.prototype.getXml = function(testsuites, testcases, stats){
   var suites = testsuites.map(function(suite, i){
-    var _suite = Object.create(suite);
-    var _cases = testcases.slice(i, suite.tests);
+    var _suite = Object.create(suite),
+        _suiteAttr = _suite.testsuite[0]._attr,
+        _cases = testcases.splice(0, _suiteAttr.tests);
+
     _suite.testsuite = _suite.testsuite.concat(_cases);
-    _suite.testsuite[0]._attr.failures = _cases.reduce(function(num, testcase){ 
+    _suiteAttr.failures = _cases.reduce(function(num, testcase){
       return num + (testcase.testcase.length > 1)? 1 : 0;
     }, 0);
-    _suite.testsuite[0]._attr.timestamp = stats.start.toISOString().slice(0,-5);
-    _suite.testsuite[0]._attr.time =  (typeof stats.duration === 'undefined') ? 0 : stats.duration / 1000;
+    _suiteAttr.time = _cases.reduce(function(suitDuration, testcase){
+      return suitDuration + testcase.testcase[0]._attr.time;
+    }, 0);
+
     return _suite;
   });
-  return xml({ testsuites: suites }, { declaration: true });
+
+  return xml({
+    testsuites: [{
+      _attr: {
+        name: 'Mocha Tests',
+        timestamp: stats.start.toISOString().slice(0,-5),
+        time: (new Date() - stats.start) / 1000,
+        failures: stats.failures,
+        errors: stats.failures
+      }
+    }].concat(suites)
+  }, { declaration: true });
 };
 
 /**

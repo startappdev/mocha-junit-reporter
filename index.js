@@ -108,7 +108,9 @@ MochaJUnitReporter.prototype.getXml = function(testsuites, testcases, stats){
     _suite.testsuite[0]._attr.time =  (typeof stats.duration === 'undefined') ? 0 : stats.duration / 1000;
     return _suite;
   });
-  return xml({ testsuites: suites }, { declaration: true });
+  return xml({ 
+    testsuites: suites
+  }, { declaration: true, indent: '  ' });
 };
 
 /**

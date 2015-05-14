@@ -4,6 +4,15 @@ module.exports = function(stats){
   var data = {
     testsuites: [
       {
+        _attr: {
+          name: "Mocha Tests",
+          tests: "2",
+          failures: "1",
+          timestamp: stats.start.toISOString().substr(0, stats.start.toISOString().indexOf('.')),
+          time: "0.002"
+        }
+      },
+      {
         testsuite: [
           {
             _attr: {
@@ -11,7 +20,7 @@ module.exports = function(stats){
               timestamp: stats.start.toISOString().substr(0,stats.start.toISOString().indexOf('.')),
               tests: "2",
               failures: "1",
-              time: stats.duration /1000
+              time: "0.002"
             }
           },
           {

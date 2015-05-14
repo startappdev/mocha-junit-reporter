@@ -92,24 +92,28 @@ MochaJUnitReporter.prototype.getTestcaseData = function(test, err){
 
 /**
  * Produces an XML string from the given test data.
- * @param {array} testcases - a list of xml configs
- * @param {number} passes - number of tests passed
- * @param {number} failures - number tests failed
+ * @param {Array.<Object>} testsuites - a list of xml configs
+ * @param {Array.<Object>} testcases - a list of xml configs
+ * @param {Object} stats - mocha statistics from the runner
  * @returns {string}
  */
 MochaJUnitReporter.prototype.getXml = function(testsuites, testcases, stats){
-  var suites = testsuites.map(function(suite, i){
+  var totalSuitesTime = 0,
+    suites = testsuites.map(function(suite){
     var _suite = Object.create(suite),
         _suiteAttr = _suite.testsuite[0]._attr,
         _cases = testcases.splice(0, _suiteAttr.tests);
 
     _suite.testsuite = _suite.testsuite.concat(_cases);
+
     _suiteAttr.failures = _cases.reduce(function(num, testcase){
       return num + ((testcase.testcase.length > 1)? 1 : 0);
     }, 0);
     _suiteAttr.time = _cases.reduce(function(suitDuration, testcase){
       return suitDuration + testcase.testcase[0]._attr.time;
     }, 0);
+
+    totalSuitesTime += _suiteAttr.time;
 
     return _suite;
   });
@@ -119,10 +123,9 @@ MochaJUnitReporter.prototype.getXml = function(testsuites, testcases, stats){
       _attr: {
         name: 'Mocha Tests',
         timestamp: stats.start.toISOString().slice(0,-5),
-        time: (new Date() - stats.start) / 1000,
+        time: totalSuitesTime,
         tests: stats.tests,
-        failures: stats.failures,
-        errors: stats.failures
+        failures: stats.failures
       }
     }].concat(suites)
   }, { declaration: true });

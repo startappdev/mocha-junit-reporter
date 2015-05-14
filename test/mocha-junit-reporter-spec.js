@@ -39,7 +39,7 @@ describe('mocha-junit-reporter', function(){
       duration: 1,
       slow: function(){}
     }, {
-      message: 'expected garthog to be dead'
+      message: 'expected garthog to be dead with invalid char:'
     });
     runner.emit('test end');
     runner.emit('end');

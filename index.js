@@ -6,6 +6,8 @@ var fs = require('fs');
 
 module.exports = MochaJUnitReporter;
 
+// A subset of invalid characters as defined in http://www.w3.org/TR/xml/#charsets that can occur in e.g. stacktraces
+var INVALID_CHARACTERS = ['\u001b'];
 
 /**
  * JUnit reporter for mocha.js.
@@ -84,9 +86,19 @@ MochaJUnitReporter.prototype.getTestcaseData = function(test, err){
     }]
   };
   if ( err ) {
-    config.testcase.push({failure: err.message});
+    config.testcase.push({failure: this.removeInvalidCharacters(err.message)});
   }
   return config;
+};
+
+/**
+ * @param {string} input
+ * @returns {string} without invalid characters
+ */
+MochaJUnitReporter.prototype.removeInvalidCharacters = function(input){
+  return INVALID_CHARACTERS.reduce(function (text, invalidCharacter) {
+    return text.replace(invalidCharacter, '');
+  }, input);
 };
 
 /**

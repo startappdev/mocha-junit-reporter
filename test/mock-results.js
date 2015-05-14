@@ -33,7 +33,7 @@ module.exports = function(stats){
                 }
               },
               {
-                failure: "expected garthog to be dead"
+                failure: "expected garthog to be dead with invalid char:"
               }
             ]
           }

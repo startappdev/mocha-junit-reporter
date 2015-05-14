@@ -128,7 +128,7 @@ MochaJUnitReporter.prototype.getXml = function(testsuites, testcases, stats){
         failures: stats.failures
       }
     }].concat(suites)
-  }, { declaration: true });
+  }, { declaration: true, indent: '  '});
 };
 
 /**
